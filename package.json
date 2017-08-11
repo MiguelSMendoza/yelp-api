@@ -4,7 +4,8 @@
     "description": "Yelp API Abstraction Layer",
     "main": "app.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon app.js"
     },
     "repository": {
         "type": "git",
@@ -20,6 +21,7 @@
         "JSONStream": "^1.3.1",
         "dotenv": "^4.0.0",
         "express": "^4.15.4",
-        "mongodb": "^2.2.31"
+        "mongodb": "^2.2.31",
+        "request": "^2.81.0"
     }
 }
