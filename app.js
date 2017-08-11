@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express'),
     mongo = require('mongodb').MongoClient,
     JSONStream = require('JSONStream'),
@@ -20,6 +21,6 @@ app.get('/yelp/search/*', function(req, res) {
     res.send(JSON.stringify(data));
 });
 
-app.listen(8080, function() {
-    console.log('Image Search Server listening on port 8080!');
+app.listen(process.env.PORT, function() {
+    console.log('Yelp API Server listening on port ' + process.env.PORT + '!');
 });
