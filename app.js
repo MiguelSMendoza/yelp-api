@@ -9,6 +9,12 @@ var ACCESS_TOKEN = '';
 
 var app = express();
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
 app.get('/yelp/', function(req, res) {
     res.writeHead(200, { 'content-type': 'text/html' })
     var fileStream = fs.createReadStream('./public/index.html');
@@ -39,29 +45,72 @@ function authApp() {
     }
 }
 
-app.get('/yelp/search/*', function(req, res) {
+app.get('/yelp/reviews/*', function(req, res) {
     var value = req.params[0];
     request.get({
-            url: 'https://api.yelp.com/v3/businesses/search',
+            url: 'https://api.yelp.com/v3/businesses/'+value+'/reviews',
             headers: {
                 Authorization: ' Bearer ' + ACCESS_TOKEN
             },
             qs: {
-                locale: 'es_ES',
-                location: value
+                locale: 'es_ES'
             }
+        },
+        function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var data = JSON.parse(body);
+                res.send(data.reviews);
+            } else {
+                res.status(404).send('Not found');
+            }
+        }
+    );
+});
+
+app.get('/yelp/search/:loc/:offset', function(req, res) {
+    var location = req.params.loc;
+    var limit = 10;
+    var long = '';
+    var lat = '';
+    var offs= req.params.offset*limit;
+    return makeRequest(location, long, lat, offs, limit, res);
+});
+
+app.get('/yelp/search/:lat/:long/:offset', function(req, res) {
+    var location = '';
+    var limit = 10;
+    var long = req.params.long;
+    var lat = req.params.lat;
+    var offs= req.params.offset*limit;
+    return makeRequest(location, long, lat, offs, limit, res);
+});
+
+function makeRequest(loc, long, lat, off, limit, res) {
+    return request.get({
+        url: 'https://api.yelp.com/v3/businesses/search',
+        headers: {
+            Authorization: ' Bearer ' + ACCESS_TOKEN
+        },
+        qs: {
+            locale: 'es_ES',
+            limit: limit,
+            location: loc,
+            latitude: lat,
+            longitude: long,
+            offset: off,
+            categories: 'nightlife'
+        }
         },
         function(error, response, body) {
             var data = JSON.parse(body);
             if (!error && response.statusCode == 200) {
                 res.send(data.businesses);
             } else {
-                res.send(data.error.description);
+                res.send(error);
             }
-
         }
     );
-});
+}
 
 app.listen(process.env.PORT, function() {
     authApp();
