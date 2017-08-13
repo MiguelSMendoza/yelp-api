@@ -45,15 +45,16 @@ function authApp() {
     }
 }
 
-app.get('/yelp/reviews/*', function(req, res) {
-    var value = req.params[0];
+app.get('/yelp/reviews/:id/:locale', function(req, res) {
+    var value = req.params.id;
+    var url = 'https://api.yelp.com/v3/businesses/'+encodeURIComponent(req.params.id)+'/reviews';
     request.get({
-            url: 'https://api.yelp.com/v3/businesses/'+value+'/reviews',
+            url: url,
             headers: {
                 Authorization: ' Bearer ' + ACCESS_TOKEN
             },
             qs: {
-                locale: 'es_ES'
+                locale: req.params.locale
             }
         },
         function(error, response, body) {
@@ -61,7 +62,7 @@ app.get('/yelp/reviews/*', function(req, res) {
                 var data = JSON.parse(body);
                 res.send(data.reviews);
             } else {
-                res.status(404).send('Not found');
+                res.send(url);
             }
         }
     );
@@ -92,7 +93,7 @@ function makeRequest(loc, long, lat, off, limit, res) {
             Authorization: ' Bearer ' + ACCESS_TOKEN
         },
         qs: {
-            locale: 'es_ES',
+            //locale: 'es_ES',
             limit: limit,
             location: loc,
             latitude: lat,
