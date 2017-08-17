@@ -64,7 +64,7 @@ app.get('/yelp/reviews/:id/:locale', function(req, res) {
                 var data = JSON.parse(body);
                 res.send(data.reviews);
             } else {
-                res.send(url);
+                res.send([]);
             }
         }
     );
