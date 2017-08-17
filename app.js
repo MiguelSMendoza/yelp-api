@@ -70,6 +70,23 @@ app.get('/yelp/reviews/:id/:locale', function(req, res) {
     );
 });
 
+app.get('/yelp/stock/:search', function(req, res) {
+    var search = req.params.search;
+    var url = 'http://d.yimg.com/autoc.finance.yahoo.com/autoc?region=&lang=&query='+search;
+    request.get({
+        url: url
+        },
+        function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var data = JSON.parse(body);
+                res.send(data.ResultSet.Result);
+            } else {
+                res.send(url);
+            }
+        }
+    );
+});
+
 app.get('/yelp/search/:loc/:offset', function(req, res) {
     var location = req.params.loc;
     var limit = 10;
